@@ -4,6 +4,7 @@
 # Important Variables
 # ===================
 export ZSH_CONFIG_DIR="$(dirname $(realpath ${(%):-%N}))"
+logout_functions=()
 
 # Theme
 # =====
@@ -14,6 +15,10 @@ source $ZSH_THEME_DIR/primary.zsh
 # ==========
 export ZSH_COMPLETE_DIR="$ZSH_CONFIG_DIR/complete"
 source $ZSH_COMPLETE_DIR/primary.zsh
+
+# SSH
+# ===
+source $ZSH_CONFIG_DIR/ssh.zsh
 
 # Customizing
 # ===========

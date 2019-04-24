@@ -1,0 +1,5 @@
+#   Gitignore
+# =============
+
+# Ignore compiled ZSh files.
+*.zwc

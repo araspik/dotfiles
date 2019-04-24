@@ -10,6 +10,7 @@ TARGET=$HOME
 VERBOSE=0
 OVERWRITE=0
 INSTALL_ZSH=0
+INSTALL_ZSH_COMPILE=0
 INSTALL_ALL=1
 
 # Parsing command-line arguments
@@ -20,9 +21,10 @@ while [[ $# -gt 0 ]]; do case "$1" in
         echo "ZSh Configuration Installer: $(basename $PROGPATH) [options...] [objects]"
         echo
         echo "  Installs various selectable configuration items into a target directory."
-	echo "  Unless an object(s) is specified, all installable objects are installed."
+        echo "  Unless an object(s) is specified, all installable objects are installed."
         echo
         echo "Objects (invertible with \"no-\" prefix):"
+        echo "  zsh-compile Compiles ZSh configuration files (no installation)."
         echo "  zsh         ZSh configuration as well as DIRCOLORS."
         echo
         echo "Options:"
@@ -44,13 +46,21 @@ while [[ $# -gt 0 ]]; do case "$1" in
     -v|--verbose)
         VERBOSE=1
         shift ;;
+    zsh-compile)
+        INSTALL_ZSH_COMPILE=1
+        INSTALL_ALL=0
+        shift ;;
+    no-zsh-compile)
+        INSTALL_ZSH_COMPILE=0
+        INSTALL_ALL=0
+        shift ;;
     zsh)
         INSTALL_ZSH=1
-	INSTALL_ALL=0
+        INSTALL_ALL=0
         shift ;;
     no-zsh)
         INSTALL_ZSH=0
-	INSTALL_ALL=0
+        INSTALL_ALL=0
         shift ;;
     *)
         echo "WARNING: Argument \"$1\" not recognized!" >&2
@@ -119,12 +129,29 @@ function link_path() {
     fi
 }
 
+if [[ $INSTALL_ZSH_COMPILE -eq 1 ]] || [[ $INSTALL_ALL -eq 1 ]]; then
+    echo -n "Precompiling ZSh Configuration... "
+
+    output=$(find $SOURCE -name '*.zsh' -exec zsh -c "zcompile {}" \;)
+
+    if [[ ! $? -eq 0 ]]; then
+        echo "error"
+        echo $output >&2
+        exit 1
+    else
+        echo "done"
+    fi
+fi
+
 if [[ $INSTALL_ZSH -eq 1 ]] || [[ $INSTALL_ALL -eq 1 ]]; then
     echo "Installing ZSh Configuration:"
 
     # Linking DIRCOLORS
     link_path "$SOURCE/zsh/theme/DIRCOLORS" "$TARGET/.dir_colors" "DIRCOLORS file"
 
-    # Linking ZSh config file
-    link_path "$SOURCE/zsh/primary.zsh" "$TARGET/.zshrc" "ZSh Config"
+    # Linking ZSh login file
+    link_path "$SOURCE/zsh/primary.zsh" "$TARGET/.zlogin" "ZSh Login"
+
+    # Linking ZSh logout file
+    link_path "$SOURCE/zsh/logout.zsh" "$TARGET/.zlogout" "ZSh Logout"
 fi
