@@ -146,9 +146,6 @@ fi
 if [[ $INSTALL_ZSH -eq 1 ]] || [[ $INSTALL_ALL -eq 1 ]]; then
     echo "Installing ZSh Configuration:"
 
-    # Linking DIRCOLORS
-    link_path "$SOURCE/zsh/theme/DIRCOLORS" "$TARGET/.dir_colors" "DIRCOLORS file"
-
     # Linking ZSh login file
     link_path "$SOURCE/zsh/primary.zsh" "$TARGET/.zlogin" "ZSh Login"
 

@@ -5,6 +5,7 @@
 # ==============
 
 source $ZSH_THEME_DIR/config.zsh
+source $ZSH_THEME_DIR/dircolors.zsh
 source $ZSH_THEME_DIR/git.zsh
 
 # Left Prompt
