@@ -11,6 +11,7 @@ VERBOSE=0
 OVERWRITE=0
 INSTALL_ZSH=0
 INSTALL_ZSH_COMPILE=0
+INSTALL_LESS=0
 INSTALL_ALL=1
 
 # Parsing command-line arguments
@@ -21,11 +22,12 @@ while [[ $# -gt 0 ]]; do case "$1" in
         echo "ZSh Configuration Installer: $(basename $PROGPATH) [options...] [objects]"
         echo
         echo "  Installs various selectable configuration items into a target directory."
-        echo "  Unless an object(s) is specified, all installable objects are installed."
+        echo "  Unless an object(s) is enabled, all installable objects are installed."
         echo
         echo "Objects (invertible with \"no-\" prefix):"
-        echo "  zsh-compile Compiles ZSh configuration files (no installation)."
-        echo "  zsh         ZSh configuration as well as DIRCOLORS."
+        echo "  zsh-compile     Compiles ZSh configuration files (no installation)."
+        echo "  zsh             ZSh configuration as well as DIRCOLORS."
+        echo "  less        Compiles and installs the Dvorak Programmer's less keys file."
         echo
         echo "Options:"
         echo "  -h      --help          This help message."
@@ -52,7 +54,6 @@ while [[ $# -gt 0 ]]; do case "$1" in
         shift ;;
     no-zsh-compile)
         INSTALL_ZSH_COMPILE=0
-        INSTALL_ALL=0
         shift ;;
     zsh)
         INSTALL_ZSH=1
@@ -60,7 +61,13 @@ while [[ $# -gt 0 ]]; do case "$1" in
         shift ;;
     no-zsh)
         INSTALL_ZSH=0
+        shift ;;
+    less)
+        INSTALL_LESS=1
         INSTALL_ALL=0
+        shift ;;
+    no-less)
+        INSTALL_LESS=0
         shift ;;
     *)
         echo "WARNING: Argument \"$1\" not recognized!" >&2
@@ -88,7 +95,9 @@ if [[ $VERBOSE -eq 1 ]]; then
     echo "  TARGET: \"$TARGET\""
     echo "  OVERWRITE: $(stringify_bool $OVERWRITE)"
     echo "  VERBOSE: yes"
+    echo "  INSTALL_ZSH_COMPILE: $(stringify_bool $INSTALL_ZSH_COMPILE)"
     echo "  INSTALL_ZSH: $(stringify_bool $INSTALL_ZSH)"
+    echo "  INSTALL_LESS: $(stringify_bool $INSTALL_LESS)"
 fi
 
 # Linker function
@@ -151,4 +160,14 @@ if [[ $INSTALL_ZSH -eq 1 ]] || [[ $INSTALL_ALL -eq 1 ]]; then
 
     # Linking ZSh logout file
     link_path "$SOURCE/zsh/logout.zsh" "$TARGET/.zlogout" "ZSh Logout"
+fi
+
+if [[ $INSTALL_LESS -eq 1 ]] || [[ $INSTALL_ALL -eq 1 ]]; then
+    echo "Installing Less keybindings file:"
+
+    # Compile the lesskey file
+    lesskey -o "$SOURCE/less/keys.dvp.less" "$SOURCE/less/keys.dvp.lesskey"
+
+    # Link it
+    link_path "$SOURCE/less/keys.dvp.less" "$TARGET/.less" "Less keybindings"
 fi

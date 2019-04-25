@@ -3,3 +3,6 @@
 
 # Ignore compiled ZSh files.
 *.zwc
+
+# Ignore compiled lesskey(1) files.
+*.lesskey
