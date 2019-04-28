@@ -32,7 +32,6 @@ while [[ $# -gt 0 ]]; do case "$1" in
         echo "Options:"
         echo "  -h      --help          This help message."
         echo "  -t PATH --target PATH   Installs to PATH (default is HOME, \"$TARGET\")."
-        echo "  -s PATH --source PATH   Installs to script directory (detected \"$SOURCE\")."
         echo "  -o      --overwrite     Overwrite any conflicting files in the target directory."
         echo "  -v      --verbose       Provides verbose messaging."
         exit 0 ;;
@@ -76,10 +75,7 @@ esac; done
 
 # Checking command-line arguments
 # ===============================
-if [[ ! -d "$SOURCE" ]]; then
-    echo "ERROR: Source directory \"$SOURCE\" is not a directory!" >&2
-    exit 1
-elif [[ ! -d "$TARGET" ]]; then
+if [[ ! -d "$TARGET" ]]; then
     echo "ERROR: Target directory \"$TARGET\" is not a directory!" >&2
     exit 1
 fi
@@ -114,7 +110,7 @@ function link_path() {
         echo "ERROR: Path \"$src\" to be linked did not exist!" >&2
         echo "  This is probably due to a corrupt/invalid SOURCE (\"$SOURCE\")" >&2
         exit 1
-    elif [[ -e $tgt ]]; then
+    elif [[ -e "$tgt" ]]; then
         if [[ $OVERWRITE -eq 1 ]]; then
             echo -n "overwriting... "
             output=$(ln -sf $src $tgt 2>&1)
@@ -155,8 +151,19 @@ fi
 if [[ $INSTALL_ZSH -eq 1 ]] || [[ $INSTALL_ALL -eq 1 ]]; then
     echo "Installing ZSh Configuration:"
 
+    # Fetching syntax highlighting submodule
+    echo -n "  Checking out Git submodules... "
+    output=$(cd $SOURCE; git submodule update --checkout 2>&1)
+    if [[ ! $? -eq 0 ]]; then
+        echo "error"
+        echo "$output" >&2
+        exit 1
+    else
+        echo "done"
+    fi
+
     # Linking ZSh login file
-    link_path "$SOURCE/zsh/primary.zsh" "$TARGET/.zlogin" "ZSh Login"
+    link_path "$SOURCE/zsh/login.zsh" "$TARGET/.zlogin" "ZSh Login"
 
     # Linking ZSh logout file
     link_path "$SOURCE/zsh/logout.zsh" "$TARGET/.zlogout" "ZSh Logout"

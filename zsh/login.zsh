@@ -6,6 +6,10 @@
 export ZSH_CONFIG_DIR="$(dirname $(realpath ${(%):-%N}))"
 logout_functions=()
 
+# Functions
+# =========
+fpath+=("$ZSH_CONFIG_DIR/functions")
+
 # Settings
 # ========
 source $ZSH_CONFIG_DIR/config.zsh
@@ -31,3 +35,8 @@ source $ZSH_CONFIG_DIR/aliases.zsh
 # Customizing
 # ===========
 source $ZSH_CONFIG_DIR/custom.zsh
+
+# Syntax Highlighting
+# ===================
+# Must be done last.
+source $ZSH_CONFIG_DIR/syntax-highlighting/zsh-syntax-highlighting.zsh
