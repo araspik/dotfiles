@@ -1,0 +1,136 @@
+#   Sway
+# ========
+#
+# Solarized-Dark based layout on Dvorak Programmer's keyboard (custom)
+
+xwayland enable
+
+set $mod Mod4
+
+#  Applications
+# ==============
+# All retrieved from ~/.local/bin.
+set $terminal ~/.local/bin/terminal
+set $wallpaper ~/.cache/wallpaper
+set $browser ~/.local/bin/browser
+set $launcher ~/.local/bin/launcher
+
+#  Output
+# ========
+output * bg $wallpaper fill
+
+#  Input
+# =======
+input "type:keyboard" {
+	xkb_layout us
+	xkb_variant dvp
+}
+
+input "type:touchpad" {
+	accel_profile adaptive
+	click_method clickfinger
+	drag enabled
+	drag_lock enabled
+	dwt enabled
+	events enabled
+	left_handed disabled
+	middle_emulation enabled
+	natural_scroll enabled
+	scroll_factor 1.1
+	scroll_method two_finger
+	tap enabled
+	tap_button_map lrm
+}
+
+#  Idle
+# ======
+exec swayidle -w \
+	timeout 300 'swaylock' \
+	timeout 600 'swaymsg "output * dpms off"' \
+		resume 'swaymsg "output * dpms on"' \
+	before-sleep 'swaylock'
+
+#  Keybindings
+# =============
+
+# Applications
+# ============
+bindsym $mod+o exec $browser
+bindsym $mod+e exec $launcher
+bindsym $mod+u exec $terminal
+
+# General Control
+# ===============
+bindsym $mod+f reload
+bindsym $mod+x exec swaynag -t warning -m 'Exit?' -b 'Yup' 'swaymsg exit'
+bindsym $mod+Shift+w exec xbacklight -dec 5
+bindsym $mod+Shift+v exec xbacklight -inc 5
+
+# Application Control
+# ===================
+floating_modifier $mod normal
+bindsym $mod+slash kill
+
+bindsym $mod+at scratchpad show
+bindsym $mod+Shift+at move scratchpad
+
+# Movement
+# ========
+bindsym $mod+h focus left
+bindsym $mod+t focus down
+bindsym $mod+n focus up
+bindsym $mod+s focus right
+bindsym $mod+g move left
+bindsym $mod+c move down
+bindsym $mod+r move up
+bindsym $mod+l move right
+
+bindsym $mod+braceright workspace 1
+bindsym $mod+parenright workspace 2
+bindsym $mod+braceleft  workspace 3
+bindsym $mod+plus       workspace 4
+bindsym $mod+Shift+braceright move container to workspace 1
+bindsym $mod+Shift+parenright move container to workspace 2
+bindsym $mod+Shift+braceleft  move container to workspace 3
+bindsym $mod+Shift+plus       move container to workspace 4
+
+bindsym $mod+i focus parent
+bindsym $mod+d focus child
+
+# Layout Control
+# ==============
+bindsym $mod+comma  layout splith
+bindsym $mod+period layout splitv
+bindsym $mod+p      layout tabbed
+
+bindsym $mod+k splith
+bindsym $mod+b splitv
+
+bindsym $mod+minus              fullscreen
+bindsym $mod+backslash          focus mode_toggle
+bindsym $mod+Shift+backslash    floating toggle
+
+bindsym $mod+Shift+h resize shrink width 10px
+bindsym $mod+Shift+t resize grow height 10px
+bindsym $mod+Shift+n resize shrink height 10px
+bindsym $mod+Shift+s resize grow width 10px
+
+#
+# Status Bar:
+#
+# Read `man 5 sway-bar` for more information about this section.
+bar {
+    position top
+
+    # When the status_command prints a new line to stdout, swaybar updates.
+    # The default just shows the current date and time.
+    status_command while date +'%Y-%m-%d %l:%M:%S %p'; do sleep 1; done
+
+    colors {
+        statusline #ffffff
+        background #323232
+        inactive_workspace #32323200 #32323200 #5c5c5c
+    }
+}
+
+include /usr/local/etc/sway/config.d/*
